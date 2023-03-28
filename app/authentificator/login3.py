@@ -113,10 +113,10 @@ async def get_token(payload: LoginDto):
 @keycloak_router.get("/protectiied")
 async def protected_route(user: dict = Depends(get_user)):
     print('hiiiiiiiiiiiiiii',user)
-    if user is not None: 
+    if user is None: 
         raise HTTPException(status_code=401, detail="invalid user token , not authentified!!")
-    # Do something with the user information
-    return {"message": "This is a protected route", "user": user}
+    # we will do me and wlidi some work or instractions here
+    return {"message": "This is a protected route and you have the right to access congratulations ;)", "user": user}
 
 @keycloak_router.get("/protectiiied")
 async def get_user_info(request: Request):
