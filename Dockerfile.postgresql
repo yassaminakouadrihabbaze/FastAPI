@@ -1,0 +1,7 @@
+FROM postgres:13
+
+ENV POSTGRES_DB=fastapi \
+    POSTGRES_USER=postgres \
+    POSTGRES_PASSWORD=1234
+
+COPY init.sql /docker-entrypoint-initdb.d/
