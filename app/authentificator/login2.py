@@ -17,7 +17,7 @@ keycloak_openid = KeycloakOpenID(server_url="http://localhost:8080/auth/",
                                  client_secret_key=""
                                 )
 
-oauth2_scheme = OAuth2AuthorizationCodeBearer(tokenUrl="http://localhost:8080/auth/realms/your-realm/protocol/openid-connect/token",
+oauth2_scheme = OAuth2AuthorizationCodeBearer(tokenUrl="http://localhost:8080/auth/realms/yassaminakh/protocol/openid-connect/token",
                                              scopes={"openid": "OpenID Connect"})
 
 # Authentication dependency
