@@ -5,6 +5,10 @@ from app.modules.patient.patient_routes import patient_router
 # from  app.authentificator.login import login_router
 from app.modules.user.user_route import user_router
 from app.authentificator.login3 import keycloak_router
+
+from app.cardiovascular.cardio_prediction import cardio_router
+from app.cardiovascular.cardio2 import cardio2
+
 # patient_model.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
@@ -18,4 +22,6 @@ app.include_router(patient_router)
 # app.include_router(login_router)
 app.include_router(user_router)
 app.include_router(keycloak_router)
+app.include_router(cardio_router)
+app.include_router(cardio2)
 
