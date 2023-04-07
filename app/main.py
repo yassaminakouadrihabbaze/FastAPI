@@ -8,7 +8,7 @@ from app.authentificator.login3 import keycloak_router
 
 from app.cardiovascular.cardio_prediction import cardio_router
 from app.cardiovascular.cardio2 import cardio2
-
+from app.diabities.diabities_rand_fores import diabities_router
 # patient_model.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
@@ -24,4 +24,5 @@ app.include_router(user_router)
 app.include_router(keycloak_router)
 app.include_router(cardio_router)
 app.include_router(cardio2)
+app.include_router(diabities_router)
 
