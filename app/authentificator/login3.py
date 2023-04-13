@@ -105,10 +105,33 @@ async def get_user(request: Request, credentials: HTTPAuthorizationCredentials =
 
 
     
-@keycloak_router.get("/get_token")
+@keycloak_router.post("/get_token")
 async def get_token(payload: LoginDto):
     token = keycloak_openid.token(payload.username, payload.password)
     return token
+
+
+# @keycloak_router.post("/logout")
+# async def get_token(request: Request):
+#     # if user in None: 
+#     #     raise HTTPException(status_code=401, detail= "Not Authentified !!!!")
+#     token =  request.headers.get("Authorization")
+#     print('heeeeeeeeeeeeeders',request.headers)
+#     print("toooooooooooooken",token)
+#     keycloak_openid.logout(token)
+#     return {"message": " suuccesful logout"} 
+
+@keycloak_router.post("/logout")
+async def get_token(request: Request):
+    token = request.headers.get("Authorization")
+    print("toooooooooooooooooken",token)
+    if token is not None:
+        token = token.split()[1]  # Extract the token from the header
+        keycloak_openid.logout(token)
+        return {"message": "successful logout"}
+    else:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+
 
 @keycloak_router.get("/protectiied")
 async def protected_route(user: dict = Depends(get_user)):
