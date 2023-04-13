@@ -126,7 +126,7 @@ async def get_token(request: Request):
     token = request.headers.get("Authorization")
     print("toooooooooooooooooken",token)
     if token is not None:
-        token = token.split()[1]  # Extract the token from the header
+        token = token.split()[1] 
         keycloak_openid.logout(token)
         return {"message": "successful logout"}
     else:
