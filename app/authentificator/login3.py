@@ -3,6 +3,7 @@ from fastapi import Request
 from fastapi import APIRouter, FastAPI, Depends, HTTPException, Header
 import httpx
 from keycloak import KeycloakOpenID
+import requests
 from sqlalchemy import null
 
 from app.authentificator.login import LoginDto
@@ -141,6 +142,16 @@ async def protected_route(user: dict = Depends(get_user)):
     # we will do me and wlidi some work or instractions here
     return {"message": "This is a protected route and you have the right to access congratulations ;)", "user": user}
 
+
+
+def has_role(user_roles : list[str],allowed_roles: list[str]):
+    have_acess = False
+    for element in user_roles:
+        if element in allowed_roles:
+           have_acess = True
+           return have_acess
+    return have_acess
+
 @keycloak_router.get("/protectiiied")
 async def get_user_info(request: Request):
     token = request.headers.get("Authorization")
@@ -151,4 +162,56 @@ async def get_user_info(request: Request):
             headers={"Authorization": token},
         )
         user_info =  response.json()
-        return user_info
+        # return user_info
+    user_roles = user_info["roles"]
+    if(has_role(user_roles,["admin","digital_desk_responsible"]) is False):
+        return {"message": "you dont have the required roles authorized"}
+    return user_info
+        
+# create a keycloak relm role 
+@keycloak_router.post("/keycloak_role")
+async def create_realm_role(request: Request, role_name: str):
+    # token = request.headers.get("Authorization")
+    # async with httpx.AsyncClient() as client:
+    #    response = await client.post(
+    #         "http://localhost:8080/auth/realms/yassaminakh/clients/myapp/roles",
+    #         #  headers={"Authorization": token},
+    #         json={"name": role_name},
+    #     )
+    # if response.status_code == 201:
+    #     return {"message": f"The role '{role_name}' was created successfully."}
+    # else:
+    #     return response.json()
+     token = request.headers.get("Authorization")
+     async with httpx.AsyncClient() as client:
+        url = f"http://localhost:8080/auth/admin/realms/yassaminakh/clients/myapp/roles"
+        payload = {
+            "name": role_name
+        }
+        headers = {
+            "Authorization": token,
+            "Content-Type": "application/json"
+        }
+        response = await client.post(url, json=payload, headers=headers)
+        
+        if response.status_code == 201:
+            return {"message": f"The role '{role_name}' was created successfully."}
+        else:
+            return response.json()
+        
+
+@keycloak_router.get("/users")
+async def get_all_users(request: Request):
+    token = request.headers.get("Authorization")
+    async with httpx.AsyncClient() as client:
+        response = await client.get(
+            "http://localhost:8080/auth/admin/realms/yassaminakh/users",
+            headers={"Authorization": token},
+        )
+
+    if response.status_code == 200:
+        users = response.json()
+        return {"users": users}
+    else:
+        print(response.content)  # Print the response content for debugging
+        return {"message": "Failed to retrieve users."}
