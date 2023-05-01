@@ -12,6 +12,7 @@ from app.diabities.diabities_rand_fores import diabities_router
 # patient_model.Base.metadata.create_all(bind=engine)
 from fastapi.middleware.cors import CORSMiddleware
 from app.kidney.kidney__disease_pre_route import kidney_desease_router 
+from app.alzihmers.routes.alzihmer_early_pre import alzihmers_Router
 
 app = FastAPI()
 
@@ -37,5 +38,6 @@ app.include_router(cardio_router)
 app.include_router(cardio2)
 app.include_router(diabities_router)
 app.include_router(kidney_desease_router)
+app.include_router(alzihmers_Router)
 
 
