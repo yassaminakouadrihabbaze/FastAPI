@@ -1,5 +1,5 @@
 import pickle
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 import pandas as pd
 from pydantic import BaseModel
 from fastapi.responses import JSONResponse
@@ -9,7 +9,7 @@ from sklearn.preprocessing import MinMaxScaler
 diabities_router = APIRouter()
 
 with open('diabities_random_forest_model.pkl','rb') as f:
-    model = pickle.load(f)
+    random_forest_model = pickle.load(f)
 
 class predict_diabities_input_data(BaseModel):
     Age: float
@@ -38,6 +38,39 @@ async def predict():
     # scaler = MinMaxScaler()
     # data[['Age']] = scaler.fit_transform(data[['Age']])
     data = pd.DataFrame([yes_diabities_input_data])
-    prediction = model.predict(data)
+    prediction = random_forest_model.predict(data)
     prediction_list = prediction.tolist()
     return JSONResponse(content={"prediction": prediction_list})
+
+
+# Gradient Boosting Classifier with probability to use with client
+@diabities_router.post("/predict/diabitiesWithProba")
+async def predict_with_gbc(request: Request):
+    
+    json_data = await  request.json()
+    print('dataaaaajson',json_data)
+
+    data = pd.DataFrame([json_data])
+    print('dataaaaa',data)
+    scaler = MinMaxScaler()
+    data[['Age']] = scaler.fit_transform(data[['Age']])
+    print('dataaaaaaaaaaa',data)
+    try:
+        proba = random_forest_model.predict_proba(data)[0]
+        prediction = int(proba[1] >= 0.5) # Use a threshold of 0.5 to convert the probabilities to binary predictions
+    except Exception as e:
+        return {'error': str(e)}
+    
+    proba_0 = float(proba[0])
+    proba_1 = float(proba[1])
+    
+    # convertion to dicimal 
+    # 5.46259808357893e-05 is equivalent to 0.0000546259808357893 in decimal notation.
+    # probability = 5.46259808357893e-05
+    probability_decimal = '{:.10f}'.format(proba_1)
+    print('prdiction',prediction)
+    print('probaaaaaaaaaaaa',proba_0)
+    print('probaaaaaaaaaaaa',proba_1)
+
+    # Return the predicted value and the probability estimates
+    return {'prediction': prediction, 'proba_0': proba_0, 'proba_1': probability_decimal}
